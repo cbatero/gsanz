@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifa Cadena de Oro GSanz - Reserva tu Número</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-top">
+            <div class="container">
+                <div class="header-contact">
+                    <span>📱 WhatsApp: +57 313 533 0859</span>
+                    <span class="separator">|</span>
+                    <span>📷 @gsanzjoyeria</span>
+                    <span class="separator">|</span>
+                    <span class="rifa-badge-header">🎁 RIFA EXCLUSIVA</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-main">
+            <div class="container">
+                <div class="logo">
+                    <img src="logo-gsanz.png" alt="GSanz Joyería">
+                    <div class="logo-text">
+                        <h1>GSanz</h1>
+                        <span class="logo-subtitle">JOYERÍA</span>
+                    </div>
+                </div>
+                <nav>
+                    <a href="#premio">El Premio</a>
+                    <a href="#numeros" class="nav-destacado">Ver Números</a>
+                    <a href="#info">Información</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero elegante y ordenado -->
+    <section id="premio" class="hero-luxury">
+        <div class="container-hero">
+            <div class="hero-header">
+                <h2 class="hero-title">Cadena Gucci</h2>
+                <div class="divider-gold"></div>
+            </div>
+            
+            <div class="premio-showcase">
+                <div class="premio-imagen">
+                    <div class="image-wrapper" id="imageZoom">
+                        <img src="cadena-premio.jpg" alt="Cadena Gucci Oro Laminado 18k" id="mainImage">
+                        <div class="zoom-hint">🔍 Haz clic para ampliar</div>
+                        <div class="valor-tag">Valor: $650.000</div>
+                    </div>
+                </div>
+                
+                <div class="premio-info">
+                    <div class="caracteristicas-lista">
+                        <div class="caracteristica">
+                            <span class="check-icon">✓</span>
+                            <span>Oro Laminado 18k</span>
+                        </div>
+                        <div class="caracteristica">
+                            <span class="check-icon">✓</span>
+                            <span>Diseño Gucci Original</span>
+                        </div>
+                        <div class="caracteristica">
+                            <span class="check-icon">✓</span>
+                            <span>Garantía de 5 Años</span>
+                        </div>
+                        <div class="caracteristica">
+                            <span class="check-icon">✓</span>
+                            <span>Estuche de Presentación</span>
+                        </div>
+                    </div>
+                    
+                    <div class="precios-box">
+                        <div class="precio-opcion">
+                            <div class="precio-header">1 Número</div>
+                            <div class="precio-monto">$12.000</div>
+                        </div>
+                        <div class="precio-separador">o</div>
+                        <div class="precio-opcion destacado">
+                            <div class="promo-label">PROMO</div>
+                            <div class="precio-header">2 Números</div>
+                            <div class="precio-monto">$20.000</div>
+                            <div class="precio-ahorro">Ahorra $4.000</div>
+                        </div>
+                    </div>
+                    
+                    <a href="#numeros" class="btn-participar">Seleccionar Números Ahora</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Indicador flotante mejorado -->
+    <div class="indicador-flotante" id="indicadorFlotante">
+        <a href="#numeros" class="pulse-button-elegant">
+            <div class="pulse-icon-elegant">◆</div>
+            <div class="pulse-content">
+                <span class="pulse-title">Selecciona tu Número</span>
+                <span class="pulse-subtitle">Haz clic aquí</span>
+            </div>
+        </a>
+    </div>
+    
+    <!-- Modal de zoom de imagen -->
+    <div id="modalZoom" class="modal-zoom">
+        <span class="zoom-close">&times;</span>
+        <img class="zoom-content" id="imgZoom">
+        <div class="zoom-caption">Cadena Gucci - Oro Laminado 18k</div>
+    </div>
+
+    <!-- Tablero de números elegante -->
+    <section id="numeros" class="section-numeros">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Selecciona tu Número de la Suerte</h2>
+                <div class="divider-gold-small"></div>
+                <p class="section-description">Haz clic en los números disponibles para reservar tu participación</p>
+            </div>
+            <div class="numeros-legend">
+                <div class="legend-item">
+                    <span class="legend-box disponible"></span>
+                    <span class="legend-label">Disponible</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-box ocupado"></span>
+                    <span class="legend-label">Reservado</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-box seleccionado"></span>
+                    <span class="legend-label">Tu Selección</span>
+                </div>
+            </div>
+            <div class="tablero-container">
+                <div class="tablero-numeros" id="tableroNumeros">
+                    <!-- Los números se generan con JavaScript -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal de reserva -->
+    <div id="modalReserva" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h3>Reservar Número(s)</h3>
+            <div id="numerosSeleccionados" class="numeros-seleccionados-display"></div>
+            <form id="formReserva">
+                <div class="form-group">
+                    <label for="nombre">Nombre Completo</label>
+                    <input type="text" id="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">WhatsApp / Teléfono</label>
+                    <input type="tel" id="telefono" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email (opcional)</label>
+                    <input type="email" id="email">
+                </div>
+                <div class="total-pagar">
+                    <span>Total a pagar:</span>
+                    <span id="totalPagar" class="total-valor">$0</span>
+                </div>
+                <button type="submit" class="btn-primary btn-block">Confirmar Reserva</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Botón flotante de carrito -->
+    <div id="carritoFlotante" class="carrito-flotante" style="display: none;">
+        <div class="carrito-content">
+            <span id="carritoCount">0</span> número(s) seleccionado(s)
+            <button class="btn-reservar" onclick="abrirModal()">Reservar</button>
+        </div>
+    </div>
+
+    <!-- Sección de información elegante -->
+    <section id="info" class="section-info">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Información de la Rifa</h2>
+                <div class="divider-gold-small"></div>
+            </div>
+            <div class="info-elegant-grid">
+                <div class="info-elegant-card">
+                    <div class="info-icon">◆</div>
+                    <h3>El Premio</h3>
+                    <p>Cadena Gucci en oro laminado de 18k con estuche de presentación y garantía de 5 años</p>
+                </div>
+                <div class="info-elegant-card">
+                    <div class="info-icon">◆</div>
+                    <h3>Fecha del Sorteo</h3>
+                    <p>Se realizará cuando todos los números estén vendidos. Notificación por WhatsApp</p>
+                </div>
+                <div class="info-elegant-card">
+                    <div class="info-icon">◆</div>
+                    <h3>Métodos de Pago</h3>
+                    <p>Transferencia bancaria, Nequi, Daviplata. Confirmación inmediata</p>
+                </div>
+                <div class="info-elegant-card">
+                    <div class="info-icon">◆</div>
+                    <h3>Garantía GSanz</h3>
+                    <p>Respaldo de joyería con trayectoria. Garantía de 5 años en la cadena</p>
+                </div>
+            </div>
+            <div class="about-gsanz">
+                <div class="about-content">
+                    <h3 class="about-title">GSanz Joyería</h3>
+                    <div class="divider-gold-small"></div>
+                    <p class="about-text">Especialistas en joyería fina con años de experiencia. La cadena Gucci en oro laminado de 18k viene con garantía de 5 años, respaldada por nuestra trayectoria y compromiso con la calidad.</p>
+                    <div class="about-features">
+                        <span class="feature-tag">Oro Laminado 18k</span>
+                        <span class="feature-tag">Diseño Gucci</span>
+                        <span class="feature-tag">Garantía 5 Años</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-elegant">
+                <div class="footer-brand">
+                    <img src="logo-gsanz.png" alt="GSanz">
+                    <h3>GSanz</h3>
+                    <p class="footer-tagline">Joyería de Excelencia</p>
+                </div>
+                <div class="footer-divider"></div>
+                <div class="footer-links">
+                    <a href="https://wa.me/573135330859" target="_blank" class="footer-link">
+                        <span class="link-icon">◆</span>
+                        <span>WhatsApp</span>
+                    </a>
+                    <a href="https://instagram.com/gsanzjoyeria" target="_blank" class="footer-link">
+                        <span class="link-icon">◆</span>
+                        <span>Instagram</span>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 GSanz Joyería. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

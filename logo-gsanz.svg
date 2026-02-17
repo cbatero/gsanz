@@ -1,0 +1,22 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo circular -->
+  <circle cx="100" cy="100" r="95" fill="#1a1a1a" stroke="#D4AF37" stroke-width="4"/>
+  
+  <!-- Diamante central -->
+  <g transform="translate(100, 80)">
+    <polygon points="0,-25 15,-10 10,15 -10,15 -15,-10" fill="#D4AF37" stroke="#F4E4B8" stroke-width="2"/>
+    <polygon points="0,-25 15,-10 0,-5" fill="#F4E4B8" opacity="0.6"/>
+    <polygon points="-15,-10 0,-25 0,-5" fill="#B8941E" opacity="0.4"/>
+  </g>
+  
+  <!-- Texto GSanz -->
+  <text x="100" y="140" font-family="serif" font-size="32" font-weight="bold" fill="#D4AF37" text-anchor="middle">GSanz</text>
+  
+  <!-- Subtítulo -->
+  <text x="100" y="160" font-family="serif" font-size="12" fill="#F4E4B8" text-anchor="middle" letter-spacing="2">JOYERÍA</text>
+  
+  <!-- Detalles decorativos -->
+  <circle cx="40" cy="100" r="3" fill="#D4AF37" opacity="0.6"/>
+  <circle cx="160" cy="100" r="3" fill="#D4AF37" opacity="0.6"/>
+  <circle cx="100" cy="40" r="3" fill="#D4AF37" opacity="0.6"/>
+</svg>

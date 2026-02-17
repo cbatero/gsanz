@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - GSanz Rifas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin-styles.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-admin">
+                    <div class="logo-icon">◆</div>
+                    <h2>GSanz Admin</h2>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-section="configuracion">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Configuración</span>
+                </a>
+                <a href="#" class="nav-item" data-section="numeros">
+                    <span class="nav-icon">🎯</span>
+                    <span>Gestión Números</span>
+                </a>
+                <a href="#" class="nav-item" data-section="sorteo">
+                    <span class="nav-icon">🎲</span>
+                    <span>Realizar Sorteo</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="cerrarSesion()">
+                    <span>🚪</span> Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <h1 id="pageTitle">Dashboard</h1>
+                <div class="user-info">
+                    <span id="userName">Admin</span>
+                </div>
+            </header>
+            
+            <!-- Dashboard Section -->
+            <section id="dashboard" class="content-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎫</div>
+                        <div class="stat-info">
+                            <h3>Números Vendidos</h3>
+                            <p class="stat-value" id="numerosVendidos">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3>Total Recaudado</h3>
+                            <p class="stat-value" id="totalRecaudado">$0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-info">
+                            <h3>Disponibles</h3>
+                            <p class="stat-value" id="numerosDisponibles">100</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🎁</div>
+                        <div class="stat-info">
+                            <h3>Estado Rifa</h3>
+                            <p class="stat-value" id="estadoRifa">Activa</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h2>Información del Premio</h2>
+                    <div class="premio-preview">
+                        <img id="premioImagenPreview" src="../cadena-premio.jpg" alt="Premio">
+                        <div class="premio-details">
+                            <h3 id="premioNombrePreview">Cadena Gucci</h3>
+                            <p id="premioDescripcionPreview">Cadena Gucci en oro laminado de 18k</p>
+                            <p class="premio-valor">Valor: $<span id="premioValorPreview">650,000</span></p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Configuración Section -->
+            <section id="configuracion" class="content-section">
+                <div class="config-container">
+                    <h2>Configuración de la Rifa</h2>
+                    
+                    <form id="configForm" class="config-form">
+                        <div class="form-section">
+                            <h3>Información del Premio</h3>
+                            
+                            <div class="form-group">
+                                <label for="nombrePremio">Nombre del Premio</label>
+                                <input type="text" id="nombrePremio" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="descripcionPremio">Descripción</label>
+                                <textarea id="descripcionPremio" rows="3" required></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="valorPremio">Valor del Premio (COP)</label>
+                                <input type="number" id="valorPremio" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="imagenPremio">URL de la Imagen</label>
+                                <input type="text" id="imagenPremio" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="caracteristicas">Características (una por línea)</label>
+                                <textarea id="caracteristicas" rows="4"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3>Configuración de Números</h3>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="numeroInicio">Número Inicial</label>
+                                    <input type="number" id="numeroInicio" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="numeroFin">Número Final</label>
+                                    <input type="number" id="numeroFin" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="precioNumero">Precio por Número (COP)</label>
+                                    <input type="number" id="precioNumero" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="precioPromo">Precio Promo 2 Números (COP)</label>
+                                    <input type="number" id="precioPromo" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3>Información del Sorteo</h3>
+                            
+                            <div class="form-group">
+                                <label for="fechaSorteo">Fecha del Sorteo</label>
+                                <input type="date" id="fechaSorteo">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="juegoLoteria">Juego de Lotería</label>
+                                <input type="text" id="juegoLoteria" placeholder="Ej: Chontico Noche">
+                                <small>Especifica con qué lotería se jugará (ej: Chontico Noche, Baloto, etc.)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Guardar Configuración</button>
+                            <button type="button" class="btn-secondary" onclick="cargarConfiguracion()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            
+            <!-- Gestión de Números Section -->
+            <section id="numeros" class="content-section">
+                <div class="numeros-container">
+                    <h2>Gestión de Números</h2>
+                    
+                    <div class="numeros-actions">
+                        <button class="btn-primary" onclick="marcarMultiples()">Marcar Múltiples</button>
+                        <button class="btn-secondary" onclick="desmarcarTodos()">Desmarcar Todos</button>
+                        <input type="text" id="buscarNumero" placeholder="Buscar número..." onkeyup="buscarNumero()">
+                    </div>
+                    
+                    <div class="numeros-grid" id="numerosGrid">
+                        <!-- Los números se generan con JavaScript -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Sorteo Section -->
+            <section id="sorteo" class="content-section">
+                <div class="sorteo-container">
+                    <h2>Realizar Sorteo</h2>
+                    
+                    <div class="sorteo-info">
+                        <div class="info-box">
+                            <h3>Información del Sorteo</h3>
+                            <p><strong>Fecha:</strong> <span id="sorteoFecha">No configurada</span></p>
+                            <p><strong>Juego:</strong> <span id="sorteoJuego">No configurado</span></p>
+                            <p><strong>Números en juego:</strong> <span id="sorteoRango">1-100</span></p>
+                            <p><strong>Números vendidos:</strong> <span id="sorteoVendidos">0</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="sorteo-actions">
+                        <div class="form-group">
+                            <label for="numeroGanador">Número Ganador</label>
+                            <input type="number" id="numeroGanador" placeholder="Ingresa el número ganador">
+                        </div>
+                        
+                        <button class="btn-primary btn-large" onclick="realizarSorteo()">
+                            🎉 Registrar Ganador
+                        </button>
+                    </div>
+                    
+                    <div id="resultadoSorteo" class="resultado-sorteo" style="display: none;">
+                        <h3>🎊 ¡Ganador Registrado!</h3>
+                        <div class="ganador-info">
+                            <p class="numero-ganador">Número: <span id="ganadorNumero"></span></p>
+                            <p>Premio: <span id="ganadorPremio"></span></p>
+                            <p>Fecha: <span id="ganadorFecha"></span></p>
+                        </div>
+                        <button class="btn-secondary" onclick="nuevaRifa()">Iniciar Nueva Rifa</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <script src="admin.js"></script>
+</body>
+</html>

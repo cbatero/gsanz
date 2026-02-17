@@ -1,0 +1,27 @@
+{
+  "rifa": {
+    "nombre": "Cadena Gucci",
+    "descripcion": "Cadena Gucci en oro laminado de 18k",
+    "valor": "650000",
+    "imagen": "../cadena-premio.jpg",
+    "caracteristicas": [
+      "Oro Laminado 18k",
+      "Diseño Gucci Original",
+      "Garantía de 5 Años",
+      "Estuche de Presentación"
+    ],
+    "precioNumero": "12000",
+    "precioPromo": "20000",
+    "numeroInicio": 1,
+    "numeroFin": 100,
+    "numerosOcupados": [5, 12, 23, 34, 45, 56, 67, 78, 89],
+    "fechaSorteo": "",
+    "juegoLoteria": "",
+    "estado": "activa",
+    "ganador": null
+  },
+  "contacto": {
+    "whatsapp": "573135330859",
+    "instagram": "@gsanzjoyeria"
+  }
+}
