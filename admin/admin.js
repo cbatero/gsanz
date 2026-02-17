@@ -58,6 +58,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
         // Actualizar título
         const titles = {
             'dashboard': 'Dashboard',
+            'ventas': 'Registro de Ventas',
             'configuracion': 'Configuración',
             'numeros': 'Gestión de Números',
             'sorteo': 'Realizar Sorteo'
@@ -99,6 +100,9 @@ async function cargarConfiguracion() {
             config = data;
         }
         
+        // Cargar ventas
+        ventas = config.ventas || [];
+        
         // Actualizar dashboard
         actualizarDashboard();
         
@@ -122,6 +126,9 @@ async function cargarConfiguracion() {
         
         // Actualizar info de sorteo
         actualizarInfoSorteo();
+        
+        // Actualizar tabla de ventas
+        actualizarTablaVentas();
         
     } catch (error) {
         console.error('Error al cargar configuración:', error);
@@ -223,25 +230,17 @@ function generarGridNumeros() {
     }
 }
 
-// Toggle número
+// Toggle número - Ahora abre modal de venta
 function toggleNumero(numero, elemento) {
     const index = numerosOcupados.indexOf(numero);
     
     if (index > -1) {
-        // Desmarcar
-        numerosOcupados.splice(index, 1);
-        elemento.classList.remove('ocupado');
-        elemento.classList.add('disponible');
+        // Si está ocupado, mostrar información de la venta
+        mostrarInfoVenta(numero);
     } else {
-        // Marcar como ocupado
-        numerosOcupados.push(numero);
-        elemento.classList.remove('disponible');
-        elemento.classList.add('ocupado');
+        // Si está disponible, abrir modal para registrar venta
+        abrirModalVenta(numero);
     }
-    
-    config.rifa.numerosOcupados = numerosOcupados;
-    guardarNumerosOcupados();
-    actualizarDashboard();
 }
 
 // Guardar números ocupados
@@ -249,6 +248,7 @@ function guardarNumerosOcupados() {
     const dataToSave = {
         encrypted: false,
         rifa: config.rifa,
+        ventas: ventas,
         contacto: config.contacto || {
             whatsapp: "573135330859",
             instagram: "@gsanzjoyeria"
@@ -393,6 +393,7 @@ function exportarDatos() {
     const dataToExport = {
         encrypted: false,
         rifa: config.rifa,
+        ventas: ventas,
         contacto: config.contacto || {
             whatsapp: "573135330859",
             instagram: "@gsanzjoyeria"
@@ -414,4 +415,372 @@ function exportarDatos() {
     URL.revokeObjectURL(url);
     
     alert('✅ Archivo descargado.\n\nPara sincronizar:\n1. Reemplaza el archivo en data/rifa-data.json\n2. Los cambios se verán en la página pública');
+}
+
+
+// ============================================
+// SISTEMA DE REGISTRO DE VENTAS
+// ============================================
+
+let ventas = [];
+
+// Abrir modal para registrar venta
+function abrirModalVenta(numero) {
+    const modal = document.getElementById('modalVenta');
+    if (!modal) {
+        crearModalVenta();
+        return abrirModalVenta(numero);
+    }
+    
+    document.getElementById('ventaNumero').value = numero;
+    document.getElementById('ventaNombre').value = '';
+    document.getElementById('ventaTelefono').value = '';
+    document.getElementById('ventaEmail').value = '';
+    document.getElementById('ventaPrecio').value = config.rifa.precioNumero;
+    document.getElementById('ventaDescuento').value = '0';
+    document.getElementById('ventaTotal').value = config.rifa.precioNumero;
+    document.getElementById('ventaNotas').value = '';
+    
+    modal.style.display = 'block';
+}
+
+// Crear modal de venta
+function crearModalVenta() {
+    const modalHTML = `
+        <div id="modalVenta" class="modal-venta">
+            <div class="modal-venta-content">
+                <span class="modal-venta-close" onclick="cerrarModalVenta()">&times;</span>
+                <h2>Registrar Venta</h2>
+                
+                <form id="formVenta" onsubmit="registrarVenta(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Número(s) *</label>
+                            <input type="text" id="ventaNumero" required placeholder="Ej: 1 o 1,5,10">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre del Comprador *</label>
+                            <input type="text" id="ventaNombre" required placeholder="Nombre completo">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Teléfono *</label>
+                            <input type="tel" id="ventaTelefono" required placeholder="3001234567">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="ventaEmail" placeholder="correo@ejemplo.com">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Precio Base</label>
+                            <input type="number" id="ventaPrecio" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Descuento ($)</label>
+                            <input type="number" id="ventaDescuento" value="0" min="0" onchange="calcularTotalVenta()">
+                        </div>
+                        <div class="form-group">
+                            <label>Total a Pagar *</label>
+                            <input type="number" id="ventaTotal" required readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label>Notas</label>
+                            <textarea id="ventaNotas" rows="3" placeholder="Información adicional..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="cerrarModalVenta()">Cancelar</button>
+                        <button type="submit" class="btn-primary">Registrar Venta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// Calcular total de venta
+function calcularTotalVenta() {
+    const numeros = document.getElementById('ventaNumero').value.split(',').filter(n => n.trim());
+    const cantidadNumeros = numeros.length;
+    const precioBase = parseInt(config.rifa.precioNumero);
+    const precioPromo = parseInt(config.rifa.precioPromo);
+    const descuento = parseInt(document.getElementById('ventaDescuento').value) || 0;
+    
+    let subtotal = 0;
+    
+    // Calcular con promoción si aplica
+    if (cantidadNumeros === 2) {
+        subtotal = precioPromo;
+    } else if (cantidadNumeros % 2 === 0 && cantidadNumeros > 0) {
+        const pares = Math.floor(cantidadNumeros / 2);
+        subtotal = pares * precioPromo;
+    } else {
+        const pares = Math.floor(cantidadNumeros / 2);
+        const sueltos = cantidadNumeros % 2;
+        subtotal = (pares * precioPromo) + (sueltos * precioBase);
+    }
+    
+    const total = Math.max(0, subtotal - descuento);
+    
+    document.getElementById('ventaPrecio').value = subtotal;
+    document.getElementById('ventaTotal').value = total;
+}
+
+// Registrar venta
+function registrarVenta(event) {
+    event.preventDefault();
+    
+    const numerosStr = document.getElementById('ventaNumero').value;
+    const numeros = numerosStr.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+    
+    // Validar que los números estén en el rango
+    const numerosInvalidos = numeros.filter(n => n < config.rifa.numeroInicio || n > config.rifa.numeroFin);
+    if (numerosInvalidos.length > 0) {
+        alert(`Números fuera de rango: ${numerosInvalidos.join(', ')}`);
+        return;
+    }
+    
+    // Validar que los números no estén ocupados
+    const numerosYaVendidos = numeros.filter(n => numerosOcupados.includes(n));
+    if (numerosYaVendidos.length > 0) {
+        alert(`Números ya vendidos: ${numerosYaVendidos.join(', ')}`);
+        return;
+    }
+    
+    const venta = {
+        id: Date.now(),
+        fecha: new Date().toISOString(),
+        numeros: numeros,
+        comprador: {
+            nombre: document.getElementById('ventaNombre').value,
+            telefono: document.getElementById('ventaTelefono').value,
+            email: document.getElementById('ventaEmail').value || ''
+        },
+        precio: {
+            base: parseInt(document.getElementById('ventaPrecio').value),
+            descuento: parseInt(document.getElementById('ventaDescuento').value) || 0,
+            total: parseInt(document.getElementById('ventaTotal').value)
+        },
+        notas: document.getElementById('ventaNotas').value || '',
+        estado: 'pagado'
+    };
+    
+    // Agregar venta
+    ventas.push(venta);
+    
+    // Marcar números como ocupados
+    numeros.forEach(n => {
+        if (!numerosOcupados.includes(n)) {
+            numerosOcupados.push(n);
+        }
+    });
+    
+    config.rifa.numerosOcupados = numerosOcupados;
+    
+    // Guardar
+    guardarVentas();
+    generarGridNumeros();
+    actualizarDashboard();
+    actualizarTablaVentas();
+    
+    cerrarModalVenta();
+    
+    alert(`✅ Venta registrada exitosamente!\n\nNúmeros: ${numeros.join(', ')}\nComprador: ${venta.comprador.nombre}\nTotal: $${venta.precio.total.toLocaleString('es-CO')}`);
+}
+
+// Cerrar modal de venta
+function cerrarModalVenta() {
+    const modal = document.getElementById('modalVenta');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Mostrar información de venta
+function mostrarInfoVenta(numero) {
+    const venta = ventas.find(v => v.numeros.includes(numero));
+    
+    if (!venta) {
+        if (confirm(`El número ${numero} está marcado como ocupado pero no tiene venta registrada.\n\n¿Deseas desmarcarlo?`)) {
+            const index = numerosOcupados.indexOf(numero);
+            if (index > -1) {
+                numerosOcupados.splice(index, 1);
+                config.rifa.numerosOcupados = numerosOcupados;
+                guardarVentas();
+                generarGridNumeros();
+                actualizarDashboard();
+            }
+        }
+        return;
+    }
+    
+    const info = `
+📋 INFORMACIÓN DE VENTA
+
+Número(s): ${venta.numeros.join(', ')}
+Fecha: ${new Date(venta.fecha).toLocaleString('es-CO')}
+
+👤 COMPRADOR:
+Nombre: ${venta.comprador.nombre}
+Teléfono: ${venta.comprador.telefono}
+Email: ${venta.comprador.email || 'No registrado'}
+
+💰 PAGO:
+Precio Base: $${venta.precio.base.toLocaleString('es-CO')}
+Descuento: $${venta.precio.descuento.toLocaleString('es-CO')}
+Total Pagado: $${venta.precio.total.toLocaleString('es-CO')}
+
+📝 Notas: ${venta.notas || 'Sin notas'}
+
+Estado: ${venta.estado.toUpperCase()}
+    `;
+    
+    if (confirm(info + '\n\n¿Deseas eliminar esta venta?')) {
+        eliminarVenta(venta.id);
+    }
+}
+
+// Eliminar venta
+function eliminarVenta(ventaId) {
+    const venta = ventas.find(v => v.id === ventaId);
+    if (!venta) return;
+    
+    // Remover números de ocupados
+    venta.numeros.forEach(n => {
+        const index = numerosOcupados.indexOf(n);
+        if (index > -1) {
+            numerosOcupados.splice(index, 1);
+        }
+    });
+    
+    // Remover venta
+    ventas = ventas.filter(v => v.id !== ventaId);
+    
+    config.rifa.numerosOcupados = numerosOcupados;
+    
+    guardarVentas();
+    generarGridNumeros();
+    actualizarDashboard();
+    actualizarTablaVentas();
+    
+    alert('Venta eliminada exitosamente');
+}
+
+// Guardar ventas
+function guardarVentas() {
+    const dataToSave = {
+        encrypted: false,
+        rifa: config.rifa,
+        ventas: ventas,
+        contacto: config.contacto || {
+            whatsapp: "573135330859",
+            instagram: "@gsanzjoyeria"
+        },
+        lastUpdate: Date.now()
+    };
+    
+    localStorage.setItem('rifaConfig', JSON.stringify(dataToSave));
+    
+    console.log('Datos actualizados. Copia a data/rifa-data.json:');
+    console.log(JSON.stringify(dataToSave, null, 2));
+}
+
+// Actualizar tabla de ventas
+function actualizarTablaVentas() {
+    const tbody = document.getElementById('tablaVentasBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    // Ordenar ventas por fecha (más reciente primero)
+    const ventasOrdenadas = [...ventas].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+    
+    ventasOrdenadas.forEach(venta => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${new Date(venta.fecha).toLocaleDateString('es-CO')}</td>
+            <td><strong>${venta.numeros.join(', ')}</strong></td>
+            <td>${venta.comprador.nombre}</td>
+            <td>${venta.comprador.telefono}</td>
+            <td>$${venta.precio.total.toLocaleString('es-CO')}</td>
+            <td><span class="badge badge-${venta.estado}">${venta.estado}</span></td>
+            <td>
+                <button class="btn-icon" onclick="mostrarInfoVenta(${venta.numeros[0]})" title="Ver detalles">👁️</button>
+                <button class="btn-icon" onclick="eliminarVenta(${venta.id})" title="Eliminar">🗑️</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    // Actualizar estadísticas
+    const totalVentas = ventas.length;
+    const totalRecaudado = ventas.reduce((sum, v) => sum + v.precio.total, 0);
+    const totalDescuentos = ventas.reduce((sum, v) => sum + v.precio.descuento, 0);
+    
+    document.getElementById('totalVentas').textContent = totalVentas;
+    document.getElementById('totalRecaudadoVentas').textContent = `$${totalRecaudado.toLocaleString('es-CO')}`;
+    document.getElementById('totalDescuentos').textContent = `$${totalDescuentos.toLocaleString('es-CO')}`;
+}
+
+// Cargar ventas desde configuración
+function cargarVentas() {
+    if (config.ventas) {
+        ventas = config.ventas;
+        actualizarTablaVentas();
+    }
+}
+
+// Exportar ventas a Excel (CSV)
+function exportarVentas() {
+    let csv = 'Fecha,Números,Comprador,Teléfono,Email,Precio Base,Descuento,Total,Estado,Notas\n';
+    
+    ventas.forEach(venta => {
+        csv += `${new Date(venta.fecha).toLocaleDateString('es-CO')},`;
+        csv += `"${venta.numeros.join(', ')}",`;
+        csv += `"${venta.comprador.nombre}",`;
+        csv += `${venta.comprador.telefono},`;
+        csv += `${venta.comprador.email || ''},`;
+        csv += `${venta.precio.base},`;
+        csv += `${venta.precio.descuento},`;
+        csv += `${venta.precio.total},`;
+        csv += `${venta.estado},`;
+        csv += `"${venta.notas || ''}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ventas-rifa-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('✅ Ventas exportadas a CSV');
+}
+
+// Buscar venta
+function buscarVenta() {
+    const busqueda = document.getElementById('buscarVenta').value.toLowerCase();
+    const filas = document.querySelectorAll('#tablaVentasBody tr');
+    
+    filas.forEach(fila => {
+        const texto = fila.textContent.toLowerCase();
+        fila.style.display = texto.includes(busqueda) ? '' : 'none';
+    });
 }

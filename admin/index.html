@@ -26,6 +26,10 @@
                     <span class="nav-icon">📊</span>
                     <span>Dashboard</span>
                 </a>
+                <a href="#" class="nav-item" data-section="ventas">
+                    <span class="nav-icon">💰</span>
+                    <span>Ventas</span>
+                </a>
                 <a href="#" class="nav-item" data-section="configuracion">
                     <span class="nav-icon">⚙️</span>
                     <span>Configuración</span>
@@ -102,6 +106,66 @@
                             <p class="premio-valor">Valor: $<span id="premioValorPreview">650,000</span></p>
                         </div>
                     </div>
+                </div>
+            </section>
+            
+            <!-- Ventas Section -->
+            <section id="ventas" class="content-section">
+                <div class="ventas-header">
+                    <h2>Registro de Ventas</h2>
+                    <div class="ventas-actions">
+                        <input type="text" id="buscarVenta" placeholder="Buscar venta..." onkeyup="buscarVenta()">
+                        <button class="btn-primary" onclick="exportarVentas()">📊 Exportar CSV</button>
+                    </div>
+                </div>
+                
+                <div class="stats-grid" style="margin-bottom: 30px;">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎫</div>
+                        <div class="stat-info">
+                            <h3>Total Ventas</h3>
+                            <p class="stat-value" id="totalVentas">0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3>Total Recaudado</h3>
+                            <p class="stat-value" id="totalRecaudadoVentas">$0</p>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🎁</div>
+                        <div class="stat-info">
+                            <h3>Descuentos Aplicados</h3>
+                            <p class="stat-value" id="totalDescuentos">$0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tabla-ventas-container">
+                    <table class="tabla-ventas">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Números</th>
+                                <th>Comprador</th>
+                                <th>Teléfono</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaVentasBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+                                    No hay ventas registradas aún
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </section>
             
