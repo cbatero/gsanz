@@ -41,6 +41,9 @@ if (currentUser) {
     document.getElementById('userName').textContent = currentUser.name;
 }
 
+// Configuración de la API
+const API_URL = 'https://gsanz.crisdev.fun/api';
+
 // Configuración global
 let config = {};
 let numerosOcupados = [];
@@ -174,7 +177,7 @@ document.getElementById('configForm').addEventListener('submit', async function(
             rifa: config.rifa,
             contacto: config.contacto || {
                 whatsapp: "573135330859",
-                instagram: "@gsanzjoyeria"
+                tiktok: "@gsanz_joteria"
             },
             lastUpdate: Date.now()
         };
@@ -241,7 +244,7 @@ function guardarNumerosOcupados() {
         ventas: ventas,
         contacto: config.contacto || {
             whatsapp: "573135330859",
-            instagram: "@gsanzjoyeria"
+            tiktok: "@gsanz_joteria"
         },
         lastUpdate: Date.now()
     };
@@ -386,7 +389,7 @@ function exportarDatos() {
         ventas: ventas,
         contacto: config.contacto || {
             whatsapp: "573135330859",
-            instagram: "@gsanzjoyeria"
+            tiktok: "@gsanz_joteria"
         },
         lastUpdate: Date.now()
     };
@@ -714,7 +717,7 @@ function guardarVentas() {
         ventas: ventas,
         contacto: config.contacto || {
             whatsapp: "573135330859",
-            instagram: "@gsanzjoyeria"
+            tiktok: "@gsanz_joteria"
         },
         lastUpdate: Date.now()
     };

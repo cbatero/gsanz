@@ -6,9 +6,7 @@ let NUMERO_INICIO = 1;
 let NUMERO_FIN = 100;
 
 // Configuración de la API
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:3000/api' 
-    : '/api';
+const API_URL = 'https://gsanz.crisdev.fun/api';
 
 // Estado de la aplicación
 let numerosOcupados = [];

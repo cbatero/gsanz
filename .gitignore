@@ -10,6 +10,12 @@ data/backup-*.json
 # Environment
 .env
 
+# API (no subir al repositorio público)
+api/
+
+# Database
+database/
+
 # OS files
 .DS_Store
 Thumbs.db
