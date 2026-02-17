@@ -2,6 +2,14 @@
 
 Este directorio contiene el archivo de datos compartido entre el panel de administración y la página pública.
 
+## ✅ Estado Actual: FUNCIONANDO
+
+La sincronización está implementada y funcionando correctamente con el siguiente flujo:
+1. Admin marca números como vendidos
+2. Admin exporta el archivo JSON actualizado
+3. Reemplaza manualmente `data/rifa-data.json`
+4. La página pública se actualiza automáticamente cada 30 segundos
+
 ## 📁 Archivo Principal
 
 **`rifa-data.json`** - Contiene toda la configuración de la rifa actual
