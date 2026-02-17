@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encriptar Datos - GSanz</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #C9A961;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #2d2d2d;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        h1 {
+            color: #C9A961;
+        }
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 10px;
+            background: #1a1a1a;
+            color: #C9A961;
+            border: 2px solid #C9A961;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        button {
+            background: #C9A961;
+            color: #1a1a1a;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #A68B4A;
+        }
+        .output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 5px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Herramienta de Encriptación GSanz</h1>
+        
+        <h2>Encriptar Usuarios</h2>
+        <p>Datos actuales (JSON):</p>
+        <textarea id="usersInput">{
+  "users": [
+    {
+      "username": "cris",
+      "password": "1823",
+      "role": "admin",
+      "name": "Administrador GSanz"
+    }
+  ]
+}</textarea>
+        <button onclick="encryptUsers()">Encriptar Usuarios</button>
+        <button onclick="hashPasswords()">Hash Contraseñas</button>
+        
+        <h2>Encriptar Configuración</h2>
+        <p>Configuración de la rifa (JSON):</p>
+        <textarea id="configInput">{
+  "rifa": {
+    "nombre": "Cadena Gucci",
+    "descripcion": "Cadena Gucci en oro laminado de 18k",
+    "valor": "650000",
+    "imagen": "../cadena-premio.jpg",
+    "caracteristicas": [
+      "Oro Laminado 18k",
+      "Diseño Gucci Original",
+      "Garantía de 5 Años",
+      "Estuche de Presentación"
+    ],
+    "precioNumero": "12000",
+    "precioPromo": "20000",
+    "numeroInicio": 1,
+    "numeroFin": 100,
+    "numerosOcupados": [],
+    "fechaSorteo": "",
+    "juegoLoteria": "",
+    "estado": "activa",
+    "ganador": null
+  },
+  "contacto": {
+    "whatsapp": "573135330859",
+    "instagram": "@gsanzjoyeria"
+  }
+}</textarea>
+        <button onclick="encryptConfig()">Encriptar Configuración</button>
+        
+        <h2>Resultado:</h2>
+        <div id="output" class="output">Los datos encriptados aparecerán aquí...</div>
+        
+        <button onclick="copyToClipboard()">📋 Copiar al Portapapeles</button>
+    </div>
+
+    <script src="crypto-utils.js"></script>
+    <script>
+        let lastOutput = '';
+
+        function encryptUsers() {
+            try {
+                const input = document.getElementById('usersInput').value;
+                const data = JSON.parse(input);
+                const encrypted = encryptFile(data);
+                lastOutput = JSON.stringify(encrypted, null, 2);
+                document.getElementById('output').textContent = lastOutput;
+                alert('✅ Usuarios encriptados. Copia el resultado y pégalo en users.json');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        function hashPasswords() {
+            try {
+                const input = document.getElementById('usersInput').value;
+                const data = JSON.parse(input);
+                
+                // Hash de contraseñas
+                data.users = data.users.map(user => ({
+                    ...user,
+                    password: hashPassword(user.password)
+                }));
+                
+                const encrypted = encryptFile(data);
+                lastOutput = JSON.stringify(encrypted, null, 2);
+                document.getElementById('output').textContent = lastOutput;
+                alert('✅ Contraseñas hasheadas y datos encriptados. Copia el resultado y pégalo en users.json');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        function encryptConfig() {
+            try {
+                const input = document.getElementById('configInput').value;
+                const data = JSON.parse(input);
+                const encrypted = encryptFile(data);
+                lastOutput = JSON.stringify(encrypted, null, 2);
+                document.getElementById('output').textContent = lastOutput;
+                alert('✅ Configuración encriptada. Copia el resultado y pégalo en config.json');
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(lastOutput).then(() => {
+                alert('✅ Copiado al portapapeles');
+            }).catch(err => {
+                alert('❌ Error al copiar: ' + err);
+            });
+        }
+    </script>
+</body>
+</html>

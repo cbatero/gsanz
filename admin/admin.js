@@ -1,11 +1,34 @@
-// Verificar autenticación
+// Verificar autenticación con encriptación
 function verificarAutenticacion() {
-    const user = sessionStorage.getItem('adminUser');
-    if (!user) {
+    const encryptedSession = sessionStorage.getItem('adminSession');
+    if (!encryptedSession) {
         window.location.href = 'login.html';
         return null;
     }
-    return JSON.parse(user);
+    
+    try {
+        const sessionData = decryptData(encryptedSession);
+        
+        if (!sessionData) {
+            sessionStorage.removeItem('adminSession');
+            window.location.href = 'login.html';
+            return null;
+        }
+        
+        // Validar token de sesión
+        if (!validateSessionToken(sessionData.token, sessionData.username, sessionData.timestamp)) {
+            sessionStorage.removeItem('adminSession');
+            window.location.href = 'login.html';
+            return null;
+        }
+        
+        return sessionData;
+    } catch (error) {
+        console.error('Error al verificar autenticación:', error);
+        sessionStorage.removeItem('adminSession');
+        window.location.href = 'login.html';
+        return null;
+    }
 }
 
 // Cargar usuario
@@ -46,16 +69,26 @@ document.querySelectorAll('.nav-item').forEach(item => {
 // Cerrar sesión
 function cerrarSesion() {
     if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-        sessionStorage.removeItem('adminUser');
+        sessionStorage.removeItem('adminSession');
         window.location.href = 'login.html';
     }
 }
 
-// Cargar configuración
+// Cargar configuración con desencriptación
 async function cargarConfiguracion() {
     try {
         const response = await fetch('config.json');
-        config = await response.json();
+        const encryptedData = await response.json();
+        
+        // Desencriptar si es necesario
+        if (encryptedData.encrypted) {
+            config = decryptFile(encryptedData);
+            if (!config) {
+                throw new Error('Error al desencriptar configuración');
+            }
+        } else {
+            config = encryptedData;
+        }
         
         // Actualizar dashboard
         actualizarDashboard();
@@ -129,13 +162,16 @@ document.getElementById('configForm').addEventListener('submit', async function(
     };
     
     try {
+        // Encriptar y guardar configuración
+        const encryptedConfig = encryptFile(config);
+        
         // En producción, esto debería guardar en el backend
-        console.log('Configuración guardada:', config);
+        console.log('Configuración encriptada:', encryptedConfig);
         
-        // Simular guardado
-        localStorage.setItem('rifaConfig', JSON.stringify(config));
+        // Simular guardado en localStorage (encriptado)
+        localStorage.setItem('rifaConfig', JSON.stringify(encryptedConfig));
         
-        alert('Configuración guardada exitosamente');
+        alert('Configuración guardada y encriptada exitosamente');
         actualizarDashboard();
         generarGridNumeros();
         actualizarInfoSorteo();
@@ -182,7 +218,8 @@ function toggleNumero(numero, elemento) {
     }
     
     config.rifa.numerosOcupados = numerosOcupados;
-    localStorage.setItem('rifaConfig', JSON.stringify(config));
+    const encryptedConfig = encryptFile(config);
+    localStorage.setItem('rifaConfig', JSON.stringify(encryptedConfig));
     actualizarDashboard();
 }
 
@@ -200,7 +237,8 @@ function marcarMultiples() {
     });
     
     config.rifa.numerosOcupados = numerosOcupados;
-    localStorage.setItem('rifaConfig', JSON.stringify(config));
+    const encryptedConfig = encryptFile(config);
+    localStorage.setItem('rifaConfig', JSON.stringify(encryptedConfig));
     generarGridNumeros();
     actualizarDashboard();
 }
@@ -210,7 +248,8 @@ function desmarcarTodos() {
     if (confirm('¿Estás seguro de desmarcar todos los números?')) {
         numerosOcupados = [];
         config.rifa.numerosOcupados = [];
-        localStorage.setItem('rifaConfig', JSON.stringify(config));
+        const encryptedConfig = encryptFile(config);
+        localStorage.setItem('rifaConfig', JSON.stringify(encryptedConfig));
         generarGridNumeros();
         actualizarDashboard();
     }
@@ -273,7 +312,8 @@ function realizarSorteo() {
     };
     config.rifa.estado = 'finalizada';
     
-    localStorage.setItem('rifaConfig', JSON.stringify(config));
+    const encryptedConfig = encryptFile(config);
+    localStorage.setItem('rifaConfig', JSON.stringify(encryptedConfig));
     
     // Mostrar resultado
     document.getElementById('ganadorNumero').textContent = numeroGanador;
@@ -295,7 +335,8 @@ function nuevaRifa() {
     config.rifa.ganador = null;
     config.rifa.estado = 'activa';
     
-    localStorage.setItem('rifaConfig', JSON.stringify(config));
+    const encryptedConfig = encryptFile(config);
+    localStorage.setItem('rifaConfig', JSON.stringify(encryptedConfig));
     
     document.getElementById('resultadoSorteo').style.display = 'none';
     document.getElementById('numeroGanador').value = '';
