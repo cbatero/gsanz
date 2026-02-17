@@ -15,6 +15,11 @@ Sistema web profesional para gestión de rifas de joyería con panel de administ
 
 ### Panel de Administración
 - Dashboard con estadísticas en tiempo real
+- Sistema completo de registro de ventas
+- Información detallada de compradores (nombre, teléfono, email)
+- Sistema de descuentos personalizados
+- Tabla de ventas con búsqueda y filtros
+- Exportación a CSV para análisis
 - Configuración completa de la rifa
 - Gestión visual de números vendidos
 - Sistema de sorteo con registro de ganadores
@@ -43,9 +48,11 @@ Sistema web profesional para gestión de rifas de joyería con panel de administ
 
 - **[⚡ Inicio Rápido](INICIO-RAPIDO.md)** - Guía de 3 pasos para empezar
 - **[🎯 Guía Admin](GUIA-ADMIN.md)** - Manual completo del panel de administración
+- **[💰 Sistema de Ventas](SISTEMA-VENTAS.md)** - Registro de compradores y descuentos
 - **[🔄 Sincronización](SINCRONIZACION.md)** - Cómo funciona la sincronización de datos
 - **[📊 Datos](data/README.md)** - Estructura del archivo de datos
 - **[🔐 Seguridad](admin/SECURITY.md)** - Encriptación y seguridad
+- **[✅ Testing](TESTING.md)** - Lista de verificación y pruebas
 
 ## 🔐 Seguridad
 
