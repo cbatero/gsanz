@@ -1,9 +1,8 @@
-// Configuración de la API
-const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-    ? 'http://localhost:3000/api' 
-    : '/api';
+// Configuración global
+let config = {};
+let numerosOcupados = [];
 
-// Verificar autenticación con encriptación
+// Navegación
 function verificarAutenticacion() {
     const encryptedSession = sessionStorage.getItem('adminSession');
     if (!encryptedSession) {

@@ -263,9 +263,14 @@
                     <div class="numeros-actions">
                         <button class="btn-primary" onclick="marcarMultiples()">Marcar Múltiples</button>
                         <button class="btn-secondary" onclick="desmarcarTodos()">Desmarcar Todos</button>
-                        <button class="btn-primary btn-exportar" onclick="exportarDatos()" id="btnExportar">
-                            📥 Exportar Datos
-                            <span class="badge-sync" id="badgeSync" style="display: none;">●</span>
+                        <button class="btn-success" onclick="descargarJSON()" title="Descargar JSON actualizado">
+                            📥 Descargar JSON
+                        </button>
+                        <button class="btn-info" onclick="cargarJSON()" title="Cargar JSON desde archivo">
+                            📤 Cargar JSON
+                        </button>
+                        <button class="btn-warning" onclick="sincronizarConArchivo()" title="Sincronizar con data/rifa-data.json">
+                            🔄 Sincronizar
                         </button>
                         <input type="text" id="buscarNumero" placeholder="Buscar número..." onkeyup="buscarNumero()">
                     </div>
@@ -317,6 +322,8 @@
     </div>
     
     <script src="crypto-utils.js"></script>
+    <script src="db-manager.js"></script>
     <script src="admin.js"></script>
+    <script src="admin-simple.js"></script>
 </body>
 </html>
