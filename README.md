@@ -1,6 +1,6 @@
 # GSanz Joyería - Sistema de Rifas
 
-Sistema web profesional para gestión de rifas de joyería con panel de administración.
+Sistema web profesional para gestión de rifas de joyería con panel de administración y sincronización en tiempo real.
 
 ## 🎯 Características
 
@@ -10,6 +10,7 @@ Sistema web profesional para gestión de rifas de joyería con panel de administ
 - Tablero interactivo de números disponibles
 - Sistema de reserva en tiempo real
 - Precios y promociones configurables
+- Actualización automática cada 30 segundos
 - Responsive (móvil y desktop)
 
 ### Panel de Administración
@@ -17,49 +18,110 @@ Sistema web profesional para gestión de rifas de joyería con panel de administ
 - Configuración completa de la rifa
 - Gestión visual de números vendidos
 - Sistema de sorteo con registro de ganadores
-- Autenticación segura
+- Exportación de datos para sincronización
+- Autenticación segura con encriptación AES-256
 
-## 🚀 Instalación
+## 🚀 Inicio Rápido
 
-1. Clona el repositorio:
-```bash
-git clone https://github.com/cbatero/gsanz.git
-cd gsanz
-```
+### Ver el Sitio Público
+1. Abre `index.html` en tu navegador
+2. Explora los números disponibles
+3. Selecciona y reserva números
 
-2. Abre `index.html` en tu navegador para ver el sitio público
+### Acceder al Admin
+1. Abre `admin/login.html`
+2. Usuario: `cris`
+3. Contraseña: `1823`
 
-3. Para el panel admin, abre `admin/login.html`
+### Sincronizar Cambios
+1. Marca números vendidos en el admin
+2. Click en "📥 Exportar Datos"
+3. Reemplaza `data/rifa-data.json` con el archivo descargado
+4. Los cambios se reflejan automáticamente en el sitio público
 
-## 🔐 Acceso Admin
+## 📚 Documentación
 
-- **Usuario:** admin
-- **Contraseña:** gsanz2024
+- **[⚡ Inicio Rápido](INICIO-RAPIDO.md)** - Guía de 3 pasos para empezar
+- **[🎯 Guía Admin](GUIA-ADMIN.md)** - Manual completo del panel de administración
+- **[🔄 Sincronización](SINCRONIZACION.md)** - Cómo funciona la sincronización de datos
+- **[📊 Datos](data/README.md)** - Estructura del archivo de datos
+- **[🔐 Seguridad](admin/SECURITY.md)** - Encriptación y seguridad
+
+## 🔐 Seguridad
+
+- Contraseñas encriptadas con SHA-256 + salt
+- Datos sensibles con AES-256
+- Tokens de sesión con expiración de 24 horas
+- Validación de sesión en cada operación
 
 ## 📁 Estructura del Proyecto
 
 ```
 gsanz/
-├── index.html              # Página principal
-├── styles.css              # Estilos del sitio público
-├── script.js               # Lógica del sitio público
-├── admin/
-│   ├── login.html         # Login del admin
-│   ├── index.html         # Panel de administración
-│   ├── admin-styles.css   # Estilos del admin
-│   ├── admin.js           # Lógica del admin
-│   ├── login.js           # Lógica de autenticación
-│   ├── users.json         # Base de datos de usuarios
-│   └── config.json        # Configuración de la rifa
-└── README.md
+├── index.html                 # Página principal pública
+├── styles.css                 # Estilos del sitio público
+├── script.js                  # Lógica del sitio público
+├── cadena-premio.jpg          # Imagen del premio
+├── logo-gsanz.svg             # Logo de la joyería
+│
+├── data/                      # Datos compartidos
+│   ├── rifa-data.json        # Configuración y números (sincronización)
+│   └── README.md             # Documentación de datos
+│
+├── admin/                     # Panel de administración
+│   ├── login.html            # Login del admin
+│   ├── login.js              # Lógica de autenticación
+│   ├── index.html            # Panel de administración
+│   ├── admin.js              # Lógica del admin
+│   ├── admin-styles.css      # Estilos del admin
+│   ├── users.json            # Usuarios encriptados
+│   ├── config.json           # Configuración local
+│   ├── crypto-utils.js       # Utilidades de encriptación
+│   ├── encrypt-data.html     # Herramienta de encriptación
+│   └── SECURITY.md           # Documentación de seguridad
+│
+└── docs/                      # Documentación
+    ├── README.md             # Este archivo
+    ├── INICIO-RAPIDO.md      # Guía rápida
+    ├── GUIA-ADMIN.md         # Manual del admin
+    └── SINCRONIZACION.md     # Documentación técnica
+```
+
+## 🔄 Flujo de Sincronización
+
+```
+Admin marca números → Exporta datos → Reemplaza archivo
+→ Página pública actualiza (30s) → Usuarios ven cambios
 ```
 
 ## 🎨 Tecnologías
 
 - HTML5
 - CSS3 (Grid, Flexbox, Animaciones)
-- JavaScript (Vanilla)
+- JavaScript (Vanilla ES6+)
+- CryptoJS (AES-256, SHA-256)
 - Google Fonts (Cormorant Garamond, Montserrat)
+
+## 💡 Características Técnicas
+
+### Frontend
+- Diseño responsive mobile-first
+- Optimizaciones para touch devices
+- Cache busting para actualizaciones
+- Lazy loading de imágenes
+- Smooth scroll y animaciones CSS
+
+### Seguridad
+- Encriptación AES-256 para datos sensibles
+- Hash SHA-256 con salt para contraseñas
+- Tokens de sesión con expiración
+- Validación de entrada en formularios
+
+### Sincronización
+- Polling cada 30 segundos
+- Exportación manual de datos
+- Validación de estructura JSON
+- Manejo de errores y fallbacks
 
 ## 📱 Contacto
 
