@@ -1,22 +1,60 @@
 // Configuración
-const TOTAL_NUMEROS = 100;
-const PRECIO_UNITARIO = 12000;
-const PRECIO_PROMO = 20000;
+let TOTAL_NUMEROS = 100;
+let PRECIO_UNITARIO = 12000;
+let PRECIO_PROMO = 20000;
+let NUMERO_INICIO = 1;
+let NUMERO_FIN = 100;
 
 // Estado de la aplicación
-let numerosOcupados = [5, 12, 23, 34, 45, 56, 67, 78, 89]; // Ejemplo de números ya vendidos
+let numerosOcupados = [];
 let numerosSeleccionados = [];
+let rifaConfig = {};
 
 // Detectar si es dispositivo móvil
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
 // Inicializar tablero al cargar la página
 document.addEventListener('DOMContentLoaded', function() {
-    generarTablero();
-    cargarNumerosOcupados();
+    cargarConfiguracionRifa();
     optimizarParaMovil();
     inicializarZoom();
+    
+    // Actualizar cada 30 segundos
+    setInterval(cargarConfiguracionRifa, 30000);
 });
+
+// Cargar configuración desde el servidor
+async function cargarConfiguracionRifa() {
+    try {
+        const response = await fetch('data/rifa-data.json?t=' + Date.now());
+        const data = await response.json();
+        
+        if (data.encrypted) {
+            console.error('Los datos están encriptados. Contacta al administrador.');
+            return;
+        }
+        
+        rifaConfig = data.rifa;
+        
+        // Actualizar configuración
+        NUMERO_INICIO = rifaConfig.numeroInicio;
+        NUMERO_FIN = rifaConfig.numeroFin;
+        TOTAL_NUMEROS = NUMERO_FIN - NUMERO_INICIO + 1;
+        PRECIO_UNITARIO = parseInt(rifaConfig.precioNumero);
+        PRECIO_PROMO = parseInt(rifaConfig.precioPromo);
+        numerosOcupados = rifaConfig.numerosOcupados || [];
+        
+        // Generar tablero con la configuración actualizada
+        generarTablero();
+        cargarNumerosOcupados();
+        
+    } catch (error) {
+        console.error('Error al cargar configuración:', error);
+        // Usar valores por defecto si falla
+        generarTablero();
+        cargarNumerosOcupados();
+    }
+}
 
 // Inicializar funcionalidad de zoom en imagen
 function inicializarZoom() {
@@ -65,9 +103,11 @@ function optimizarParaMovil() {
 // Generar tablero de números
 function generarTablero() {
     const tablero = document.getElementById('tableroNumeros');
+    if (!tablero) return;
+    
     tablero.innerHTML = '';
     
-    for (let i = 1; i <= TOTAL_NUMEROS; i++) {
+    for (let i = NUMERO_INICIO; i <= NUMERO_FIN; i++) {
         const numeroDiv = document.createElement('div');
         numeroDiv.className = 'numero-item disponible';
         numeroDiv.textContent = i;
@@ -95,8 +135,7 @@ function generarTablero() {
 
 // Cargar números ocupados desde el servidor (simulado)
 function cargarNumerosOcupados() {
-    // Aquí conectarías con tu backend para obtener los números realmente ocupados
-    // Por ahora usamos los números de ejemplo
+    // Los números ocupados ya vienen de la configuración cargada
     actualizarTablero();
 }
 
@@ -293,8 +332,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // Actualizar números ocupados periódicamente (simulado)
 // En producción, esto haría polling a tu backend
 setInterval(() => {
-    // Aquí harías fetch a tu API para obtener números actualizados
-    // fetch('/api/numeros-ocupados').then(...)
+    cargarConfiguracionRifa();
 }, 30000); // Cada 30 segundos
 
 // Prevenir zoom accidental en móvil al hacer doble tap

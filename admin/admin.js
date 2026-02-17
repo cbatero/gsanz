@@ -77,17 +77,26 @@ function cerrarSesion() {
 // Cargar configuración con desencriptación
 async function cargarConfiguracion() {
     try {
-        const response = await fetch('config.json');
-        const encryptedData = await response.json();
+        // Intentar cargar desde el archivo compartido primero
+        let response = await fetch('../data/rifa-data.json?t=' + Date.now());
+        let data = await response.json();
         
-        // Desencriptar si es necesario
-        if (encryptedData.encrypted) {
-            config = decryptFile(encryptedData);
-            if (!config) {
-                throw new Error('Error al desencriptar configuración');
+        // Si no existe o falla, cargar desde config.json
+        if (!data || !data.rifa) {
+            response = await fetch('config.json');
+            const encryptedData = await response.json();
+            
+            // Desencriptar si es necesario
+            if (encryptedData.encrypted) {
+                config = decryptFile(encryptedData);
+                if (!config) {
+                    throw new Error('Error al desencriptar configuración');
+                }
+            } else {
+                config = encryptedData;
             }
         } else {
-            config = encryptedData;
+            config = data;
         }
         
         // Actualizar dashboard
@@ -162,16 +171,29 @@ document.getElementById('configForm').addEventListener('submit', async function(
     };
     
     try {
-        // Encriptar y guardar configuración
-        const encryptedConfig = encryptFile(config);
+        // Guardar configuración
+        const dataToSave = {
+            encrypted: false,
+            rifa: config.rifa,
+            contacto: config.contacto || {
+                whatsapp: "573135330859",
+                instagram: "@gsanzjoyeria"
+            },
+            lastUpdate: Date.now()
+        };
         
         // En producción, esto debería guardar en el backend
-        console.log('Configuración encriptada:', encryptedConfig);
+        console.log('Configuración a guardar:', dataToSave);
         
-        // Simular guardado en localStorage (encriptado)
-        localStorage.setItem('rifaConfig', JSON.stringify(encryptedConfig));
+        // Simular guardado en localStorage y archivo compartido
+        localStorage.setItem('rifaConfig', JSON.stringify(dataToSave));
         
-        alert('Configuración guardada y encriptada exitosamente');
+        // Mostrar JSON para copiar manualmente al archivo
+        console.log('Copia este JSON a data/rifa-data.json:');
+        console.log(JSON.stringify(dataToSave, null, 2));
+        
+        alert('Configuración guardada exitosamente.\n\nIMPORTANTE: Para que los cambios se reflejen en la página pública, copia el JSON de la consola a data/rifa-data.json');
+        
         actualizarDashboard();
         generarGridNumeros();
         actualizarInfoSorteo();
@@ -218,9 +240,27 @@ function toggleNumero(numero, elemento) {
     }
     
     config.rifa.numerosOcupados = numerosOcupados;
-    const encryptedConfig = encryptFile(config);
-    localStorage.setItem('rifaConfig', JSON.stringify(encryptedConfig));
+    guardarNumerosOcupados();
     actualizarDashboard();
+}
+
+// Guardar números ocupados
+function guardarNumerosOcupados() {
+    const dataToSave = {
+        encrypted: false,
+        rifa: config.rifa,
+        contacto: config.contacto || {
+            whatsapp: "573135330859",
+            instagram: "@gsanzjoyeria"
+        },
+        lastUpdate: Date.now()
+    };
+    
+    localStorage.setItem('rifaConfig', JSON.stringify(dataToSave));
+    
+    // Mostrar en consola para actualización manual
+    console.log('Números actualizados. Copia a data/rifa-data.json:');
+    console.log(JSON.stringify(dataToSave, null, 2));
 }
 
 // Marcar múltiples números
@@ -237,8 +277,7 @@ function marcarMultiples() {
     });
     
     config.rifa.numerosOcupados = numerosOcupados;
-    const encryptedConfig = encryptFile(config);
-    localStorage.setItem('rifaConfig', JSON.stringify(encryptedConfig));
+    guardarNumerosOcupados();
     generarGridNumeros();
     actualizarDashboard();
 }
@@ -248,8 +287,7 @@ function desmarcarTodos() {
     if (confirm('¿Estás seguro de desmarcar todos los números?')) {
         numerosOcupados = [];
         config.rifa.numerosOcupados = [];
-        const encryptedConfig = encryptFile(config);
-        localStorage.setItem('rifaConfig', JSON.stringify(encryptedConfig));
+        guardarNumerosOcupados();
         generarGridNumeros();
         actualizarDashboard();
     }
@@ -349,3 +387,31 @@ function nuevaRifa() {
 
 // Inicializar
 cargarConfiguracion();
+
+// Exportar datos para sincronización
+function exportarDatos() {
+    const dataToExport = {
+        encrypted: false,
+        rifa: config.rifa,
+        contacto: config.contacto || {
+            whatsapp: "573135330859",
+            instagram: "@gsanzjoyeria"
+        },
+        lastUpdate: Date.now()
+    };
+    
+    const jsonString = JSON.stringify(dataToExport, null, 2);
+    
+    // Crear blob y descargar
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'rifa-data.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert('✅ Archivo descargado.\n\nPara sincronizar:\n1. Reemplaza el archivo en data/rifa-data.json\n2. Los cambios se verán en la página pública');
+}
