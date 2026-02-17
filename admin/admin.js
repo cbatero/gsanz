@@ -1,3 +1,8 @@
+// Configuración de la API
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:3000/api' 
+    : '/api';
+
 // Verificar autenticación con encriptación
 function verificarAutenticacion() {
     const encryptedSession = sessionStorage.getItem('adminSession');
@@ -78,27 +83,11 @@ function cerrarSesion() {
 // Cargar configuración con desencriptación
 async function cargarConfiguracion() {
     try {
-        // Intentar cargar desde el archivo compartido primero
-        let response = await fetch('../data/rifa-data.json?t=' + Date.now());
+        // Intentar cargar desde la API primero
+        let response = await fetch(`${API_URL}/data`);
         let data = await response.json();
         
-        // Si no existe o falla, cargar desde config.json
-        if (!data || !data.rifa) {
-            response = await fetch('config.json');
-            const encryptedData = await response.json();
-            
-            // Desencriptar si es necesario
-            if (encryptedData.encrypted) {
-                config = decryptFile(encryptedData);
-                if (!config) {
-                    throw new Error('Error al desencriptar configuración');
-                }
-            } else {
-                config = encryptedData;
-            }
-        } else {
-            config = data;
-        }
+        config = data;
         
         // Cargar ventas
         ventas = config.ventas || [];
@@ -130,9 +119,11 @@ async function cargarConfiguracion() {
         // Actualizar tabla de ventas
         actualizarTablaVentas();
         
+        console.log('✅ Configuración cargada desde API');
+        
     } catch (error) {
-        console.error('Error al cargar configuración:', error);
-        alert('Error al cargar la configuración');
+        console.error('❌ Error al cargar configuración:', error);
+        alert('Error al cargar la configuración. Asegúrate de que el servidor esté corriendo.');
     }
 }
 
@@ -541,7 +532,7 @@ function calcularTotalVenta() {
 }
 
 // Registrar venta
-function registrarVenta(event) {
+async function registrarVenta(event) {
     event.preventDefault();
     
     const numerosStr = document.getElementById('ventaNumero').value;
@@ -579,45 +570,49 @@ function registrarVenta(event) {
         estado: 'pagado'
     };
     
-    // Agregar venta
-    ventas.push(venta);
-    
-    // Marcar números como ocupados
-    numeros.forEach(n => {
-        if (!numerosOcupados.includes(n)) {
-            numerosOcupados.push(n);
-        }
-    });
-    
-    config.rifa.numerosOcupados = numerosOcupados;
-    
-    // Guardar
-    guardarVentas();
-    generarGridNumeros();
-    actualizarDashboard();
-    actualizarTablaVentas();
-    
-    cerrarModalVenta();
-    
-    // Mostrar confirmación con recordatorio de exportar
-    const mensaje = `✅ Venta registrada exitosamente!
+    try {
+        // Guardar venta en la API
+        const response = await fetch(`${API_URL}/ventas`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(venta)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Actualizar datos locales
+            config = result.data;
+            ventas = config.ventas;
+            numerosOcupados = config.rifa.numerosOcupados;
+            
+            // Actualizar interfaz
+            generarGridNumeros();
+            actualizarDashboard();
+            actualizarTablaVentas();
+            
+            cerrarModalVenta();
+            
+            alert(`✅ Venta registrada y guardada exitosamente!
 
 📋 DETALLES:
 Números: ${numeros.join(', ')}
 Comprador: ${venta.comprador.nombre}
 Total: $${venta.precio.total.toLocaleString('es-CO')}
 
-⚠️ IMPORTANTE:
-Los números están marcados en el admin, pero para que aparezcan como "Reservado" en la página pública debes:
-
-1. Click en "📥 Exportar Datos" (arriba)
-2. Descargar el archivo rifa-data.json
-3. Reemplazar el archivo en: data/rifa-data.json
-
-¿Deseas exportar ahora?`;
-    
-    if (confirm(mensaje)) {
-        exportarDatos();
+✅ Los cambios ya están guardados en el servidor.
+✅ La página pública se actualizará automáticamente.`);
+            
+            console.log('✅ Venta guardada en servidor');
+        } else {
+            throw new Error(result.error || 'Error al guardar venta');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error al registrar venta:', error);
+        alert('❌ Error al guardar la venta. Verifica que el servidor esté corriendo.');
     }
 }
 
@@ -674,29 +669,42 @@ Estado: ${venta.estado.toUpperCase()}
 }
 
 // Eliminar venta
-function eliminarVenta(ventaId) {
+async function eliminarVenta(ventaId) {
     const venta = ventas.find(v => v.id === ventaId);
     if (!venta) return;
     
-    // Remover números de ocupados
-    venta.numeros.forEach(n => {
-        const index = numerosOcupados.indexOf(n);
-        if (index > -1) {
-            numerosOcupados.splice(index, 1);
+    if (!confirm(`¿Estás seguro de eliminar esta venta?\n\nNúmeros: ${venta.numeros.join(', ')}\nComprador: ${venta.comprador.nombre}`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/ventas/${ventaId}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Actualizar datos locales
+            config = result.data;
+            ventas = config.ventas;
+            numerosOcupados = config.rifa.numerosOcupados;
+            
+            // Actualizar interfaz
+            generarGridNumeros();
+            actualizarDashboard();
+            actualizarTablaVentas();
+            
+            alert('✅ Venta eliminada exitosamente');
+            console.log('✅ Venta eliminada del servidor');
+        } else {
+            throw new Error(result.error || 'Error al eliminar venta');
         }
-    });
-    
-    // Remover venta
-    ventas = ventas.filter(v => v.id !== ventaId);
-    
-    config.rifa.numerosOcupados = numerosOcupados;
-    
-    guardarVentas();
-    generarGridNumeros();
-    actualizarDashboard();
-    actualizarTablaVentas();
-    
-    alert('Venta eliminada exitosamente');
+        
+    } catch (error) {
+        console.error('❌ Error al eliminar venta:', error);
+        alert('❌ Error al eliminar la venta. Verifica que el servidor esté corriendo.');
+    }
 }
 
 // Guardar ventas

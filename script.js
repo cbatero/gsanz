@@ -5,6 +5,11 @@ let PRECIO_PROMO = 20000;
 let NUMERO_INICIO = 1;
 let NUMERO_FIN = 100;
 
+// Configuración de la API
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:3000/api' 
+    : '/api';
+
 // Estado de la aplicación
 let numerosOcupados = [];
 let numerosSeleccionados = [];
@@ -26,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Cargar configuración desde el servidor
 async function cargarConfiguracionRifa() {
     try {
-        const response = await fetch('data/rifa-data.json?t=' + Date.now());
+        const response = await fetch(`${API_URL}/data?t=` + Date.now());
         const data = await response.json();
         
         if (data.encrypted) {
@@ -48,8 +53,10 @@ async function cargarConfiguracionRifa() {
         generarTablero();
         cargarNumerosOcupados();
         
+        console.log('✅ Configuración cargada desde API');
+        
     } catch (error) {
-        console.error('Error al cargar configuración:', error);
+        console.error('❌ Error al cargar configuración:', error);
         // Usar valores por defecto si falla
         generarTablero();
         cargarNumerosOcupados();
