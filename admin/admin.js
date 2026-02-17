@@ -599,7 +599,26 @@ function registrarVenta(event) {
     
     cerrarModalVenta();
     
-    alert(`✅ Venta registrada exitosamente!\n\nNúmeros: ${numeros.join(', ')}\nComprador: ${venta.comprador.nombre}\nTotal: $${venta.precio.total.toLocaleString('es-CO')}`);
+    // Mostrar confirmación con recordatorio de exportar
+    const mensaje = `✅ Venta registrada exitosamente!
+
+📋 DETALLES:
+Números: ${numeros.join(', ')}
+Comprador: ${venta.comprador.nombre}
+Total: $${venta.precio.total.toLocaleString('es-CO')}
+
+⚠️ IMPORTANTE:
+Los números están marcados en el admin, pero para que aparezcan como "Reservado" en la página pública debes:
+
+1. Click en "📥 Exportar Datos" (arriba)
+2. Descargar el archivo rifa-data.json
+3. Reemplazar el archivo en: data/rifa-data.json
+
+¿Deseas exportar ahora?`;
+    
+    if (confirm(mensaje)) {
+        exportarDatos();
+    }
 }
 
 // Cerrar modal de venta
@@ -784,3 +803,45 @@ function buscarVenta() {
         fila.style.display = texto.includes(busqueda) ? '' : 'none';
     });
 }
+
+
+// Indicador de cambios sin sincronizar
+let cambiosSinSincronizar = false;
+
+function marcarCambiosSinSincronizar() {
+    cambiosSinSincronizar = true;
+    const badge = document.getElementById('badgeSync');
+    const btnExportar = document.getElementById('btnExportar');
+    
+    if (badge && btnExportar) {
+        badge.style.display = 'inline';
+        btnExportar.classList.add('btn-pulse');
+        btnExportar.title = '¡Hay cambios sin sincronizar! Click para exportar';
+    }
+}
+
+function limpiarIndicadorSincronizacion() {
+    cambiosSinSincronizar = false;
+    const badge = document.getElementById('badgeSync');
+    const btnExportar = document.getElementById('btnExportar');
+    
+    if (badge && btnExportar) {
+        badge.style.display = 'none';
+        btnExportar.classList.remove('btn-pulse');
+        btnExportar.title = 'Exportar datos para sincronizar';
+    }
+}
+
+// Modificar guardarVentas para marcar cambios
+const guardarVentasOriginal = guardarVentas;
+guardarVentas = function() {
+    guardarVentasOriginal();
+    marcarCambiosSinSincronizar();
+};
+
+// Modificar exportarDatos para limpiar indicador
+const exportarDatosOriginal = exportarDatos;
+exportarDatos = function() {
+    exportarDatosOriginal();
+    limpiarIndicadorSincronizacion();
+};

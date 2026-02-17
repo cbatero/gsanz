@@ -263,7 +263,10 @@
                     <div class="numeros-actions">
                         <button class="btn-primary" onclick="marcarMultiples()">Marcar Múltiples</button>
                         <button class="btn-secondary" onclick="desmarcarTodos()">Desmarcar Todos</button>
-                        <button class="btn-primary" onclick="exportarDatos()">📥 Exportar Datos</button>
+                        <button class="btn-primary btn-exportar" onclick="exportarDatos()" id="btnExportar">
+                            📥 Exportar Datos
+                            <span class="badge-sync" id="badgeSync" style="display: none;">●</span>
+                        </button>
                         <input type="text" id="buscarNumero" placeholder="Buscar número..." onkeyup="buscarNumero()">
                     </div>
                     
